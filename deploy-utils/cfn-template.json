@@ -1,7 +1,17 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
   "Metadata": {},
-  "Parameters": {},
+  "Parameters": {
+    "S3BucketCodeBase": {
+      "Type": "String",
+      "Default": "codebase-httpswatch",
+      "Description": "S3 Bucket Name for Code Base"
+    },
+    "AppVersion": {
+      "Type": "String",
+      "Description": "Current Version of the App"
+    }
+  },
   "Conditions": {},
   "Resources": {
     "S3BucketDailyReports": {
@@ -135,7 +145,15 @@
         "Description" : "Building Daily Website HTTPS configurations",
         "Code": {
           "S3Bucket": "codebase-httpswatch",
-          "S3Key": "0.0.20.zip"
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                { "Ref": "AppVersion"},
+                ".zip"
+              ]
+            ]
+          }
         },
         "Handler" : "lambda.myHandler",
         "MemorySize" : 256,

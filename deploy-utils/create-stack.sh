@@ -11,11 +11,13 @@ PROFILE=${2:-"personal"}
 
 BUCKET=codebase-httpswatch
 TEMPLATE_BODY=file://$PWD/deploy-utils/cfn-template.json
+PARAMETERS_URL=file://$PWD/build/cfn-parameters.json
 
 COMMAND="aws --profile ${PROFILE} \
   cloudformation create-stack \
     --stack-name ${STACK_NAME} \
     --template-body $TEMPLATE_BODY \
+    --parameters $PARAMETERS_URL \
     --capabilities CAPABILITY_IAM"
 
 WAIT_COMMAND="aws --profile ${PROFILE} \

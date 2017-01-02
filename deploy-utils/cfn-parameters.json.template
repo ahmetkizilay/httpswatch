@@ -1,0 +1,6 @@
+[
+  {
+    "ParameterKey": "AppVersion",
+    "ParameterValue": "{{AppVersion}}"
+  }
+]
