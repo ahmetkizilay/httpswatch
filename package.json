@@ -11,9 +11,12 @@
     "clean": "rm -rf ./build",
     "build": "bash ./deploy-utils/build.sh && bash ./deploy-utils/update-template-version.sh",
     "upload": "bash ./deploy-utils/upload-to-s3.sh",
-    "update": "bash ./deploy-utils/update-stack.sh httpswatch",
+    "update": "bash ./deploy-utils/update-stack.sh $1",
+    "create": "bash ./deploy-utils/create-stack.sh $1",
+    "test": "node ./test/test.js",
     "clean-build": "npm run clean && npm run build",
-    "clean-build-update": "npm run clean-build && npm run update",
-    "clean-build-upload-update": "npm run clean-build-update && npm run update"
+    "clean-build-upload": "npm run clean-build && npm run upload",
+    "clean-build-upload-create": "npm run clean-build-upload && npm run create $1",
+    "clean-build-upload-update": "npm run clean-build-upload && npm run update $1"
   }
 }
