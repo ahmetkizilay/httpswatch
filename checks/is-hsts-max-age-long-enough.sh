@@ -4,7 +4,7 @@ SITE=$1
 TODAY=$2
 COMPARE_AGE=${3:-10886400}
 
-HTTPS_FILE_NAME="./"$TODAY"/https-"$SITE
+HTTPS_FILE_NAME="/tmp/"$TODAY"/https-"$SITE
 
 MAX_AGE=$(cat $HTTPS_FILE_NAME | grep -i "^< Strict-Transport-Security: " | grep -ioh "max-age=[0-9]*" | sed 's/max-age=//')
 

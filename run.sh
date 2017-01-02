@@ -1,8 +1,14 @@
 #!/bin/bash
 
-TODAY=$(date +%Y-%m-%d)
+INPUT_FILE=${1:-"input.txt"}
 
-echo -e "VALID_SSL\tHTTP_AVAILABLE\t"
+TODAY=$2
+if [ "$TODAY" == "" ]; then
+  TODAY=$(date +%Y-%m-%d)
+fi
+
+
+echo -e 'NAME\tVALID SSL\tHTTPS AVAILABLE\tDEFAULTS TO HTTPS\tHSTS ENABLED\tHSTS INCLUDES SUBDOMAINS\tHSTS MAX AGE LONG ENOUGH\tHTSH PRELOAD'
 while IFS='' read -r line || [[ -n "$line" ]]; do
   /bin/bash ./test.sh $line $TODAY
-done < "$1"
+done < "$INPUT_FILE"

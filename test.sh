@@ -4,9 +4,11 @@ function print_validity {
   INPUT=${1:-"0"}
 
   if [ $INPUT -gt 0 ]; then
-    echo -en "\e[32m\u2714\e[39m"
+    # echo -en "\e[32m\u2714\e[39m"
+    echo -n 1
   else
-    echo -en "\e[31m\u2718\e[39m"
+    # echo -en "\e[31m\u2718\e[39m"
+    echo -n 0
   fi
 }
 
@@ -31,6 +33,8 @@ if [ $HAS_HSTS_HEADER -gt 0 ]; then
 
 fi
 
+
+echo -en $1'\t'
 
 #echo -n "VALID SSL "
 print_validity $SSL_OK
@@ -60,4 +64,4 @@ echo -en "\t"
 print_validity $DOES_HSTS_HAVE_PRELOAD
 echo -en "\t"
 
-echo $1
+echo

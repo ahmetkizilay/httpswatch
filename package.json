@@ -1,0 +1,10 @@
+{
+  "name": "instagram-maps",
+  "description": "searches for instagram posts in the vicinity",
+  "version": "0.0.20",
+  "private": true,
+  "dependencies": {
+    "aws-sdk": "^2.7.20",
+    "promise": "^7.1.1"
+  }
+}

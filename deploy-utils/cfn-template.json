@@ -1,0 +1,149 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Metadata": {},
+  "Parameters": {},
+  "Conditions": {},
+  "Resources": {
+    "S3BucketDailyReports": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {}
+    },
+    "S3BucketDailyArchives": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "Properties": {}
+    },
+    "RoleHTTPSReports": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Path": "/RoleHTTPSReports/",
+        "Policies": [
+          {
+            "PolicyName" : "PolicyBucketBuildGraphJSON",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                      "s3:Put*", "s3:Get*"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:s3:::",
+                          { "Ref": "S3BucketDailyReports" },
+                          "/*"
+                        ]
+                      ]
+                    },
+                    {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "arn:aws:s3:::",
+                          { "Ref": "S3BucketDailyArchives" },
+                          "/*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "PolicyName": "PolicyCreateLogs",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "arn:aws:logs:*:*:*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "ScheduledRuleTriggerDailyReport": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Scheduling daily reports.",
+        "ScheduleExpression": "cron(0 10 * * ? *)",
+        "State": "ENABLED",
+        "Targets": [{
+          "Arn": { "Fn::GetAtt": ["LambdaDailyReport", "Arn"] },
+          "Id": "TriggerDailyReport",
+          "Input": {
+            "Fn::Join": [
+              "",
+              [
+                "{",
+                "\"Region\": \"", { "Ref": "AWS::Region"}, "\",\n",
+                "\"ReportBucket\": \"", { "Ref": "S3BucketDailyReports"}, "\",\n",
+                "\"ArchiveBucket\": \"", { "Ref": "S3BucketDailyArchives"}, "\"\n",
+                "}"
+              ]
+            ]
+          }
+        }]
+      }
+    },
+    "PermissionTriggerDailyReport": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": { "Ref": "LambdaDailyReport" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "ScheduledRuleTriggerDailyReport",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "LambdaDailyReport": {
+      "Type" : "AWS::Lambda::Function",
+      "Properties" : {
+        "Description" : "Building Daily Website HTTPS configurations",
+        "Code": {
+          "S3Bucket": "codebase-httpswatch",
+          "S3Key": "0.0.20.zip"
+        },
+        "Handler" : "lambda.myHandler",
+        "MemorySize" : 256,
+        "Timeout" : 300,
+        "Role": { "Fn::GetAtt" : ["RoleHTTPSReports", "Arn"] },
+        "Runtime" : "nodejs4.3"
+      }
+    }
+  },
+  "Outputs": {}
+}
